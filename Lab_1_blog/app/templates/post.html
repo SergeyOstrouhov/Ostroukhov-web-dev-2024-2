@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="card-title">{{ posts[3].title }}</h2>
+
+    <div> {{ post.date }}</div>
+    <div class="fw-bold fs-5">{{ post.author }}</div>
+    <img class="card-img-top" src="{{ url_for('static', filename='images/' + post.image_id) }}" alt="Card image cap">
+    <div> {{ post.text }}</div>
+    <div class="container d-flex flex-column inp_com">
+        <div class="label_inp_com p-1">Оставьте комментарий</div>
+        <div class="p-2 w-100">
+             <textarea name="Введите текст комментария" id="your_com" cols="30" rows="5" class="w-100"></textarea>
+        </div>
+
+        <button class="but_com">Отправить</button>
+    </div>
+    {% for com in post.comments %}
+    <div class="fw-bold fs-4"> {{ com.author }}</div>
+    <div> {{ com.text }}</div>
+    <div class="container">
+        {% for rep in com.replies %}
+        <div class="d-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-up" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.854 1.146a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L4 2.707V12.5A2.5 2.5 0 0 0 6.5 15h8a.5.5 0 0 0 0-1h-8A1.5 1.5 0 0 1 5 12.5V2.707l3.146 3.147a.5.5 0 1 0 .708-.708z"/>
+            </svg>
+            <div class="fw-bold fs-5 w-25"> {{ rep.author }} </div>
+        </div>
+        <div> {{ rep.text }} </div>
+        {% endfor %}
+    </div>
+
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
