@@ -28,7 +28,7 @@
                 <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'args' %} active {% endif %}" aria-current="page" href="{{ url_for('args') }}">args</a>
+                <a class="nav-link {% if request.endpoint == 'args' %} active {% endif %}" aria-current="page" href="{{ url_for('args', q='qq') }}">args</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'headers' %} active {% endif %}" aria-current="page" href="{{ url_for('headers') }}">headers</a>

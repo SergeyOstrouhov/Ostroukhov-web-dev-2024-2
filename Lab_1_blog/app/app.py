@@ -24,7 +24,7 @@ def generate_comments(replies=True):
 
 def generate_post(i):
     return {
-        'title': 'Заголовок поста',
+        'title': fake.sentence(),
         'text': fake.paragraph(nb_sentences=100),
         'author': fake.name(),
         'date': fake.date_time_between(start_date='-2y', end_date='now'),
