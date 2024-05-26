@@ -1,0 +1,17 @@
+{% macro pagination(count, page)%}
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+      {%if page > 1%}
+      <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, page=page-1)}}">Previous</a></li>
+      {%endif%}
+      {% set begin = [1, page-2] | max %}
+      {% set end = [ count, page + 2 ] | min %}
+      {% for  i in range(begin,end+1) %}
+        <li class="page-item {% if i == page %} active {% endif%}" ><a class="page-link" href="{{ url_for(request.endpoint, page=i)}}">{{ i }}</a></li>
+      {% endfor %}
+      {%if page < count%}
+      <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, page=page+1)}}">Next</a></li>
+      {%endif%}
+    </ul>
+  </nav>
+{% endmacro %}
