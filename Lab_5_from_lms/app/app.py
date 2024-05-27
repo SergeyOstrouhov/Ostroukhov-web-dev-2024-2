@@ -24,7 +24,7 @@ def log_request_info():
     if request.endpoint=="static":
         return
     path=request.path
-    user_id=getattr(current_user,"id",None)
+    user_id=getattr(current_user,"id", "Неаутентифицированный пользователь")
     with db.connect().cursor(named_tuple=True) as cursor:
         query = ('INSERT INTO logs (user_id,path) VALUES (%s,%s)')
         cursor.execute(query,(user_id,path))

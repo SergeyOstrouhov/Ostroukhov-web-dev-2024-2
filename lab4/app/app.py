@@ -86,14 +86,16 @@ def validate_login(text):
 
 
 def validate_password(password):
+    bad_length = False
     if not 8 <= len(password) <= 128:
-        return False
-  
+        bad_length = True
+    
     has_upper = False
     has_lower = False
     has_digit = False
     has_arabic_digit = False
     has_space = False
+    bad_chrs = False
   
     for char in password:
         if char.isupper():
@@ -111,9 +113,28 @@ def validate_password(password):
   
     for char in password:
         if char not in allowed_chars:
-            return False
-  
-    return has_upper and has_lower and has_digit and has_arabic_digit and not has_space
+            bad_chrs = True
+
+    res = []
+    if bad_length:
+        res.append('Пароль должен быть больше 8 символов и меньше 128')
+    if not has_upper:
+        res.append('Пароль должен содежрать хотя бы одну заглавную букву\n')
+    if not has_lower:
+        res.append('Пароль долже содержать хотя бы одну строчную букву\n')
+    if not has_digit:
+        res.append('Пароль должен содержать хотя бы одну цифру\n')
+    if not has_arabic_digit:
+        res.append('Пароль должен содержать только арабские цифры\n')
+    if has_space:
+        res.append('Пароль не должен содержать пробелы\n')
+    if bad_chrs:
+        res.append('Пароль должен содежрать тольк одопустимые символы\n')
+
+    if len(res) != 0:
+        return False, res
+    else:
+        return True, res
 
 
 @app.route('/create_user', methods=['GET','POST'])
@@ -128,8 +149,10 @@ def create_user():
         password = request.form.get('password')
         role_id = request.form.get('role')
         val_log = validate_login(login)
+        val_pas = validate_password(password)
+        res_val = val_pas[1]
         if val_log[0]:
-            if validate_password(password):
+            if val_pas[0]:
 
                 try:
                     with db.connect().cursor(named_tuple=True) as cursor:
@@ -142,7 +165,8 @@ def create_user():
                     db.connect().rollback()
                     flash('Ошибка при регистрации', 'danger')
             else:
-                flash("Пароль не соответствует требованиям", 'danger')
+                for i in res_val:
+                    flash(i, 'danger')
                 return render_template('create_user.html', roles = roles)
         else:
             flash(val_log[1], 'danger')

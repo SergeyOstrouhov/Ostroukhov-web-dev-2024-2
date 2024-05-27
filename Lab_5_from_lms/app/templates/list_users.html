@@ -15,7 +15,7 @@
         {% for user in users %}
         <tr>
             <td class="user-login"> {{user.login}}</td>
-            <td> {{user.first_name}} {{user.second_name}} {%if user.middle_name%}{{user.middle_name}}{%endif%}</td>
+            <td> {{user.first_name}} {{user.last_name}} {%if user.middle_name%}{{user.middle_name}}{%endif%}</td>
             <td> {{user.role}}</td>
             <td>
                 <div class="actions">
