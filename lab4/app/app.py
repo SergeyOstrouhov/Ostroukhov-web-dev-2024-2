@@ -114,7 +114,6 @@ def validate_password(password):
     for char in password:
         if char not in allowed_chars:
             bad_chrs = True
-
     res = []
     if bad_length:
         res.append('Пароль должен быть больше 8 символов и меньше 128')
@@ -231,6 +230,7 @@ def change_password(user_id):
         old_pass = request.form.get('password')
         new_password = request.form.get('password2')
         new_password2 = request.form.get('password3')
+        
         with db.connect().cursor(named_tuple=True) as cursor:
             query = ('SELECT * FROM users WHERE id=%s and password_hash=SHA2(%s,256) ')
             cursor.execute(query,(user_id, old_pass))

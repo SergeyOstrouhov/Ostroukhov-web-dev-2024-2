@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+   <h1> Форма для проверки номера телефона</h1>
+    <form method="POST">
+        <div class="container mb-3">
+            <input type="text" id="typePhone" class="form-control {{ category }}" name="number" value="{{ request.form.get('number','') }}" required/>
+            <div class="valid-feedback">
+                {{ otv }}
+            </div>
+            <div class="invalid-feedback">
+                {{ otv }}
+            </div>
+           
+            <button type="submit" class="btn btn-primary">Проверить</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

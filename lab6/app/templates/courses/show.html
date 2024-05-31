@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="title-area position-relative" style="background-image: url({{ course.bg_image.url }});">
+    <div class="h-100 w-100 py-5 d-flex text-center position-absolute" style="background-color: rgba(0, 0, 0, 0.65);">
+        <div class="m-auto">
+            <h1 class="title mb-3 font-weight-bold">{{ course.name }}</h1>
+            <p class="mb-3 mx-auto">
+                {{ course.category.name }} | <span>★</span> <span>{{ "%.2f" | format(course.rating) }}</span> |  Всего оценок: {{course.rating_num }}
+            </p>
+            <div class="container">
+                <p class="description w-75 mb-5 mx-auto">
+                    {{ course.short_desc }}
+                </p>
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="py-3 d-block">
+                <div class="m-2"><a href="#" class="btn btn-outline-light btn-lg">Перейти к материалам курса</a></div>
+                <div class="m-2"><a href="{{ url_for('courses.add_review', course_id=course.id) }}"
+                        class="btn btn-outline-light btn-lg">Оставить отзыв</a></div>
+            </div>
+
+            {% else %}
+            <button class="btn btn-outline-light btn-lg" disabled>Записаться</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <section class="about mb-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">О курсе</h2>
+        <p>{{ course.full_desc }}</p>
+    </section>
+
+    <section class="program mb-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Программа курса</h2>
+
+        {% for theme in course.themes %}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Тема {{ loop.index }}. {{ theme.name }}</h5>
+                {% if current_user.is_authenticated and current_user.id == course.author_id %}
+                <button class="btn btn-primary btn-sm ms-auto" title="Добавить пункт"
+                    data-parent-id="{{ theme.id }}">+</button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% set outer_loop = loop %}
+                {% for subtheme in theme.subthemes %}
+                <div class="d-flex align-items-center">
+                    <p class="card-text mb-3">{{ outer_loop.index }}.{{ loop.index }}. {{ subtheme.name }}</p>
+                    {% if current_user.is_authenticated and current_user.id == course.author_id %}
+                    <a href="#" class="btn btn-sm ms-auto" title="Добавить материал"
+                        data-parent-id="{{ theme.id }}">+</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        <section class="about m-5">
+            <h2 class="m-3 text-center text-uppercase font-weight-bold">Отзывы о курсе</h2>
+            {% for rev in reviews %}
+            <div class="p-3 card">
+                <h5>Текст отзыва:</h5>
+                {{ rev.text}}
+                <h5>Оценка:</h5>
+                {{ rev.rating}}
+                <h5>Дата публикации:</h5>
+                {{ rev.created_at}}
+
+            </div>
+            
+
+            
+            {% endfor %}
+            <div class="m-2"><a href="{{url_for('courses.view_course_reviews', course_id=course.id)}}" class="btn btn-outline-dark btn-lg">Посмотреть все отзывы</a></div>
+        </section>
+        {% if current_user.is_authenticated and current_user.id == course.author_id %}
+        <div class="text-center">
+            <button type="button" class="btn btn-dark">
+                Добавить тему
+            </button>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+{% endblock %}

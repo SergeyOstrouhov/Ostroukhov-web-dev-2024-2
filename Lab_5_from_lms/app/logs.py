@@ -45,7 +45,7 @@ def show_user_logs():
             query = 'SELECT logs.*, users.first_name, users.last_name, users.middle_name FROM logs LEFT JOIN users ON logs.user_id = users.id ORDER BY id DESC LIMIT %s OFFSET %s '
             cursor.execute(query, (PER_PAGE, (page - 1) * PER_PAGE))
         else:
-            query = f'SELECT * FROM logs WHERE user_id = {int(current_user.id)} LIMIT %s OFFSET %s'
+            query = f'SELECT logs.*, users.first_name, users.last_name, users.middle_name  FROM logs LEFT JOIN users ON logs.user_id = users.id WHERE user_id = {int(current_user.id)} ORDER BY id DESC LIMIT %s OFFSET %s'
             cursor.execute(query, (PER_PAGE, (page - 1) * PER_PAGE))
         logs = cursor.fetchall()
 
@@ -101,6 +101,7 @@ def show_page_logs():
 
 @bp.route("/export_csv")
 @login_required
+@checkRole("prev_logs")
 def export_csv():
     if (current_user.can('prev_logs', current_user) == True):
         with db.connect().cursor(named_tuple=True) as cursor:
@@ -126,6 +127,7 @@ def export_csv():
 
 @bp.route("/export_csv_pages")
 @login_required
+@checkRole("prev_logs")
 def export_csv_pages():
     with db.connect().cursor(named_tuple=True) as cursor:
         query = ('SELECT path,count(*) as count FROM logs group by path order by count')
@@ -136,6 +138,8 @@ def export_csv_pages():
     return send_file(data, as_attachment=True,download_name='download_pages.csv')
 
 @bp.route("/export_csv_users")
+@login_required
+@checkRole("prev_logs")
 def export_csv_users():
     with db.connect().cursor(named_tuple=True) as cursor:
         query = ('SELECT user_id, users.first_name, users.last_name, users.middle_name, count(*) as count FROM logs LEFT JOIN users ON logs.user_id = users.id  group by user_id ORDER BY count DESC')

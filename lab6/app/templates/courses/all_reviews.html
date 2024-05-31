@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% import 'pagination.html' as macros %}
+{% block content %}
+<div class="container">
+    <h2 class="my-3 text-center text-uppercase font-weight-bold">Отзывы о курсе</h2>
+    
+    <!-- Форма фильтрации -->
+    <form method="GET" action="{{ url_for('courses.view_course_reviews', course_id=course_id) }}">
+        <div class="mb-3">
+            <label for="sort">Сортировка:</label>
+            <select name="sort" id="sort" class="form-select">
+                <option value="newest" {% if sort_order == 'newest' %}selected{% endif %}>По новизне</option>
+                <option value="positive" {% if sort_order == 'positive' %}selected{% endif %}>Сначала положительные</option>
+                <option value="negative" {% if sort_order == 'negative' %}selected{% endif %}>Сначала отрицательные</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Применить</button>
+        </div>
+    </form>
+    
+    <!-- Список отзывов -->
+    {% for review in reviews %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ review.login }}</h5>
+            <p class="card-text">{{ review.text }}</p>
+            <p class="card-text">Рейтинг: {{ review.rating }}</p>
+            <p class="card-text">Дата: {{ review.created_at }}</p>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Пагинация -->
+    {{ macros.render_pagination(pagination, 'courses.view_course_reviews', {'course_id': course_id, 'sort': sort_order}) }}
+</div>
+{% endblock %}

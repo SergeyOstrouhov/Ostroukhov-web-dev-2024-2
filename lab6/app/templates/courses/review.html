@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        
+        {% if exist%}
+            <h2 class="my-3 text-center text-uppercase font-weight-bold">Ваш отзыв о курсе "{{ course.name }}"</h2>
+            <div class="card-body">
+                <p class="card-text">{{ exist.text }}</p>
+                <p class="card-text">Рейтинг: {{ exist.rating }}</p>
+                <p class="card-text">Дата: {{ exist.created_at }}</p>
+            </div>
+        {% else%}
+        <h2 class="my-3 text-center text-uppercase font-weight-bold">Новый отзыв для курса "{{ course.name }}"</h2>
+        <form method="POST" action="{{ url_for('courses.add_review', course_id=course.id) }}">
+            <input type="hidden" name="author_id" value="{{ current_user.id }}">
+            <input type="hidden" name="course_id" value="{{ course.id }}">
+
+            <div class="mb-3">
+                <label for="text">Ваш отзыв</label>
+                <textarea class="form-control" name="text" id="text" cols="30" rows="10" required>{{ request.form.get('text', '') }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="rating" class="form-label">Оценка</label>
+                <select id="rating" name="rating" class="form-select" required>
+                    <option value="5" selected>Отлично</option>
+                    <option value="4">Хорошо</option>
+                    <option value="3">Удовлетворительно</option>
+                    <option value="2">Неудовлетворительно</option>
+                    <option value="1">Плохо</option>
+                    <option value="0">Ужасно</option>
+                </select>
+            </div>
+            <div class="mb-3 text-center">
+                <input type="submit" class="btn btn-dark" value="Опубликовать отзыв">
+            </div>
+        </form>
+        {%endif%}
+    </div>
+{% endblock %}
