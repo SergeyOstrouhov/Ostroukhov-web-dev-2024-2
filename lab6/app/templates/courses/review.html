@@ -5,10 +5,10 @@
         
         {% if exist%}
             <h2 class="my-3 text-center text-uppercase font-weight-bold">Ваш отзыв о курсе "{{ course.name }}"</h2>
-            <div class="card-body">
-                <p class="card-text">{{ exist.text }}</p>
+            <div class="card-body fs-5 text-center">
+                <p class="card-text">Текст отзыва: {{ exist.text }}</p>
                 <p class="card-text">Рейтинг: {{ exist.rating }}</p>
-                <p class="card-text">Дата: {{ exist.created_at }}</p>
+                <p class="card-text">Дата создания: {{ exist.created_at }}</p>
             </div>
         {% else%}
         <h2 class="my-3 text-center text-uppercase font-weight-bold">Новый отзыв для курса "{{ course.name }}"</h2>
