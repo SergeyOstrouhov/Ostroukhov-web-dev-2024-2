@@ -15,6 +15,7 @@
         <form method="POST" action="{{ url_for('courses.add_review', course_id=course.id) }}">
             <input type="hidden" name="author_id" value="{{ current_user.id }}">
             <input type="hidden" name="course_id" value="{{ course.id }}">
+           
 
             <div class="mb-3">
                 <label for="text">Ваш отзыв</label>

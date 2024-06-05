@@ -3,24 +3,36 @@
 {% block content %}
 <div class="container">
     <h2 class="my-3 text-center text-uppercase font-weight-bold">Отзывы о курсе</h2>
+
+
+    <!-- Список отзывов -->
+    {% if exist%}
+    <h2 class="my-3 text-center text-uppercase font-weight-bold">Ваш отзыв о курсе "{{ course.name }}"</h2>
+    <div class="card-body fs-5 text-center">
+        <p class="card-text">Текст отзыва: {{ exist.text }}</p>
+        <p class="card-text">Рейтинг: {{ exist.rating }}</p>
+        <p class="card-text">Дата создания: {{ exist.created_at }}</p>
+    </div>
     
-    <!-- Форма фильтрации -->
-    <form method="GET" action="{{ url_for('courses.view_course_reviews', course_id=course_id) }}">
+    {%endif%}
+     <!-- Форма фильтрации -->
+     <form method="GET" action="{{ url_for('courses.view_course_reviews', course_id=course.id) }}">
         <div class="mb-3">
             <label for="sort">Сортировка:</label>
             <select name="sort" id="sort" class="form-select">
-                <option value="newest" {% if sort_order == 'newest' %}selected{% endif %}>По новизне</option>
-                <option value="positive" {% if sort_order == 'positive' %}selected{% endif %}>Сначала положительные</option>
-                <option value="negative" {% if sort_order == 'negative' %}selected{% endif %}>Сначала отрицательные</option>
+                <option value="newest" {% if sort_order=='newest' %}selected{% endif %}>По новизне</option>
+                <option value="positive" {% if sort_order=='positive' %}selected{% endif %}>Сначала положительные
+                </option>
+                <option value="negative" {% if sort_order=='negative' %}selected{% endif %}>Сначала отрицательные
+                </option>
             </select>
         </div>
         <div class="mb-3">
             <button type="submit" class="btn btn-primary">Применить</button>
         </div>
     </form>
-    
-    <!-- Список отзывов -->
     {% for review in reviews %}
+    
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">{{ review.login }}</h5>
@@ -30,8 +42,9 @@
         </div>
     </div>
     {% endfor %}
-    
+
     <!-- Пагинация -->
-    {{ macros.render_pagination(pagination, 'courses.view_course_reviews', {'course_id': course_id, 'sort': sort_order}) }}
+    {{ macros.render_pagination(pagination, 'courses.view_course_reviews', {'course_id': course.id, 'sort': sort_order})
+    }}
 </div>
 {% endblock %}

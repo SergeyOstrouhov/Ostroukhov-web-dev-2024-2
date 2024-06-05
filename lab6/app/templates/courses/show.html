@@ -16,8 +16,6 @@
             {% if current_user.is_authenticated %}
             <div class="py-3 d-block">
                 <div class="m-2"><a href="#" class="btn btn-outline-light btn-lg">Перейти к материалам курса</a></div>
-                <div class="m-2"><a href="{{ url_for('courses.add_review', course_id=course.id) }}"
-                        class="btn btn-outline-light btn-lg">Оставить отзыв</a></div>
             </div>
 
             {% else %}
@@ -60,9 +58,43 @@
         </div>
         {% endfor %}
         <section class="about m-5">
+            {% if exist%}
+    <h2 class="my-3 text-center text-uppercase font-weight-bold">Ваш отзыв о курсе "{{ course.name }}"</h2>
+    <div class="card-body fs-5 text-center">
+        <p class="card-text">Текст отзыва: {{ exist.text }}</p>
+        <p class="card-text">Рейтинг: {{ exist.rating }}</p>
+        <p class="card-text">Дата создания: {{ exist.created_at }}</p>
+    </div>
+    {% else%}
+    <h2 class="my-3 text-center text-uppercase font-weight-bold">Новый отзыв для курса "{{ course.name }}"</h2>
+    <form method="POST" action="{{ url_for('courses.add_review', course_id=course.id) }}">
+        <input type="hidden" name="author_id" value="{{ current_user.id }}">
+        <input type="hidden" name="course_id" value="{{ course.id }}">
+        <input type="hidden" name="stran" value="2">
+        <div class="mb-3">
+            <label for="text">Ваш отзыв</label>
+            <textarea class="form-control" name="text" id="text" cols="30" rows="10"
+                required>{{ request.form.get('text', '') }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="rating" class="form-label">Оценка</label>
+            <select id="rating" name="rating" class="form-select" required>
+                <option value="5" selected>Отлично</option>
+                <option value="4">Хорошо</option>
+                <option value="3">Удовлетворительно</option>
+                <option value="2">Неудовлетворительно</option>
+                <option value="1">Плохо</option>
+                <option value="0">Ужасно</option>
+            </select>
+        </div>
+        <div class="mb-3 text-center">
+            <input type="submit" class="btn btn-dark" value="Опубликовать отзыв">
+        </div>
+    </form>
+    {%endif%}
             <h2 class="m-3 text-center text-uppercase font-weight-bold">Отзывы о курсе</h2>
             {% for rev in reviews %}
-            <div class="p-3 card">
+            <div class="p-3 card my-2">
                 <h5>Текст отзыва:</h5>
                 {{ rev.text}}
                 <h5>Оценка:</h5>
@@ -75,6 +107,7 @@
 
             
             {% endfor %}
+            
             <div class="m-2"><a href="{{url_for('courses.view_course_reviews', course_id=course.id)}}" class="btn btn-outline-dark btn-lg">Посмотреть все отзывы</a></div>
         </section>
         {% if current_user.is_authenticated and current_user.id == course.author_id %}

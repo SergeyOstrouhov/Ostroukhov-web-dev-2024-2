@@ -74,16 +74,19 @@ def create():
 @bp.route('/<int:course_id>')
 def show(course_id):
     course = db.get_or_404(Course, course_id)
-    reviews = db.session.query(Review).filter(Review.course_id == course_id).order_by(desc(Review.created_at)).limit(5).all()
+    reviews = db.session.query(Review).filter(Review.course_id == course_id).order_by(desc(Review.created_at)).filter(Review.user_id != current_user.id).limit(5).all()
+    exist = db.session.query(Review).filter(Review.user_id == current_user.id).first()
     
-    return render_template('courses/show.html', course=course, reviews=reviews)
+    return render_template('courses/show.html', course=course, reviews=reviews, exist=exist)
 
 @bp.route('/new_review/<int:course_id>', methods=['GET', 'POST'])
 @login_required
 def add_review(course_id):
     course = db.session.get(Course, course_id)
     exist = db.session.query(Review).filter(Review.user_id == current_user.id).first()
-    print(exist)
+    if exist:
+        flash(f'Произошла ошибка при добавлении отзыва: вы уже остывили отзыв об этом курсе', 'warning')
+        return redirect(url_for('courses.show', course_id=course.id))
     if not course:
         flash('Курс не найден.', 'danger')
         return redirect(url_for('index'))  # или любая другая страница
@@ -91,7 +94,7 @@ def add_review(course_id):
     if request.method == 'POST':
         text = request.form.get('text')
         rating = request.form.get('rating')
-        
+        page = request.form.get('stran')
         try:
             new_review = Review(
                 text=text,
@@ -100,28 +103,33 @@ def add_review(course_id):
                 user_id=current_user.id
             )
             db.session.add(new_review)
-            course.rating_sum = ((course.rating_sum * course.rating_num) + new_review.rating) / (course.rating_num)
+            course.rating_sum += int(rating)
             course.rating_num += 1
             db.session.commit()
             flash('Ваш отзыв был добавлен!', 'success')
-            return redirect(url_for('courses.show', course_id=course.id))
         except Exception as e:
             db.session.rollback()  # Откат транзакции в случае ошибки
             flash(f'Произошла ошибка при добавлении отзыва: {str(e)}', 'danger')
-    
-    return render_template('courses/review.html', course=course, exist=exist)
+            if page == "1":
+                return redirect(url_for('courses.view_course_reviews', course_id=course.id))
+            elif page == "2":
+                return redirect(url_for('courses.show', course_id=course.id))
+    if page == "1":
+        return redirect(url_for('courses.view_course_reviews', course_id=course.id))
+    elif page == "2":
+        return redirect(url_for('courses.show', course_id=course.id))
 
 
 @bp.route('/<int:course_id>/reviews', methods=['GET'])
 def view_course_reviews(course_id):
-    # Получаем текущую страницу из параметров запроса
+    course = db.session.get(Course, course_id)
     page = request.args.get('page', 1, type=int)
     
     # Получаем порядок сортировки из параметров запроса
     sort_order = request.args.get('sort', 'newest')
     
     # Фильтруем отзывы по id курса
-    reviews_query = db.session.query(Review.text, Review.created_at, Review.rating , User.login).join(User).filter(Review.course_id == course_id)
+    reviews_query = db.session.query(Review.text, Review.created_at, Review.rating , User.login).join(User).filter(Review.course_id == course_id).filter(Review.user_id != current_user.id)
     
     # Применяем сортировку в зависимости от выбранного порядка
     if sort_order == 'positive':
@@ -134,5 +142,6 @@ def view_course_reviews(course_id):
     # Получаем отзывы для текущей страницы
     pagination = reviews_query.paginate(page=page, per_page=3)
     reviews = pagination.items
+    exist = db.session.query(Review).filter(Review.user_id == current_user.id).first()
     
-    return render_template('courses/all_reviews.html', course_id=course_id, reviews=reviews, pagination=pagination, sort_order=sort_order)
+    return render_template('courses/all_reviews.html', course=course, reviews=reviews, pagination=pagination, sort_order=sort_order, exist=exist)
